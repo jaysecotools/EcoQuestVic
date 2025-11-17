@@ -212,21 +212,112 @@
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback } = React;
 
-        // Victoria-specific wildlife and locations
+        // Victoria-specific wildlife and locations - UPDATED WITH BIOME COMPATIBILITY
         const victoriaWildlife = {
-            koala: { name: "Koala", rarity: "vulnerable", habitat: "eucalypt_forest", indicator: "forest health", image: "🐨" },
-            platypus: { name: "Platypus", rarity: "vulnerable", habitat: "freshwater_rivers", indicator: "water quality", image: "🦆" },
-            lyrebird: { name: "Superb Lyrebird", rarity: "common", habitat: "rainforest", indicator: "forest health", image: "🦚" },
-            wombat: { name: "Common Wombat", rarity: "common", habitat: "forest", indicator: "soil health", image: "🐻" },
-            kangaroo: { name: "Eastern Grey Kangaroo", rarity: "common", habitat: "grassland", indicator: "grassland health", image: "🦘" },
-            possum: { name: "Mountain Brushtail Possum", rarity: "common", habitat: "forest", indicator: "forest health", image: "🐭" },
-            eagle: { name: "Wedge-tailed Eagle", rarity: "vulnerable", habitat: "varied", indicator: "ecosystem health", image: "🦅" },
-            parrot: { name: "Crimson Rosella", rarity: "common", habitat: "forest", indicator: "forest health", image: "🐦" },
-            glider: { name: "Yellow-bellied Glider", rarity: "vulnerable", habitat: "eucalypt_forest", indicator: "forest maturity", image: "🦇" },
-            fish: { name: "Australian Grayling", rarity: "endangered", habitat: "riparian", indicator: "water quality", image: "🐟" },
-            ground_parrot: { name: "Eastern Ground Parrot", rarity: "endangered", habitat: "coastal_heath", indicator: "heathland health", image: "🦜" },
-            leadbeater: { name: "Leadbeater's Possum", rarity: "endangered", habitat: "mountain_ash", indicator: "old growth forest", image: "🐿️" },
-            helmeted_honeyeater: { name: "Helmeted Honeyeater", rarity: "endangered", habitat: "swamp_forest", indicator: "wetland health", image: "🐦" }
+            koala: { 
+                name: "Koala", 
+                rarity: "vulnerable", 
+                habitat: "eucalypt_forest", 
+                indicator: "forest health", 
+                image: "🐨",
+                biomes: ["mountain", "temperate_rainforest", "forest"]
+            },
+            platypus: { 
+                name: "Platypus", 
+                rarity: "vulnerable", 
+                habitat: "freshwater_rivers", 
+                indicator: "water quality", 
+                image: "🦆",
+                biomes: ["mountain", "temperate_rainforest", "forest", "coastal"]
+            },
+            lyrebird: { 
+                name: "Superb Lyrebird", 
+                rarity: "common", 
+                habitat: "rainforest", 
+                indicator: "forest health", 
+                image: "🦚",
+                biomes: ["temperate_rainforest", "forest", "mountain"]
+            },
+            wombat: { 
+                name: "Common Wombat", 
+                rarity: "common", 
+                habitat: "forest", 
+                indicator: "soil health", 
+                image: "🐻",
+                biomes: ["forest", "mountain", "temperate_rainforest", "alpine"]
+            },
+            kangaroo: { 
+                name: "Eastern Grey Kangaroo", 
+                rarity: "common", 
+                habitat: "grassland", 
+                indicator: "grassland health", 
+                image: "🦘",
+                biomes: ["arid", "forest", "mountain", "coastal"]
+            },
+            possum: { 
+                name: "Mountain Brushtail Possum", 
+                rarity: "common", 
+                habitat: "forest", 
+                indicator: "forest health", 
+                image: "🐭",
+                biomes: ["forest", "temperate_rainforest", "mountain", "alpine"]
+            },
+            eagle: { 
+                name: "Wedge-tailed Eagle", 
+                rarity: "vulnerable", 
+                habitat: "varied", 
+                indicator: "ecosystem health", 
+                image: "🦅",
+                biomes: ["mountain", "forest", "temperate_rainforest", "alpine", "arid", "coastal", "marine_coastal"]
+            },
+            parrot: { 
+                name: "Crimson Rosella", 
+                rarity: "common", 
+                habitat: "forest", 
+                indicator: "forest health", 
+                image: "🐦",
+                biomes: ["forest", "temperate_rainforest", "mountain"]
+            },
+            glider: { 
+                name: "Yellow-bellied Glider", 
+                rarity: "vulnerable", 
+                habitat: "eucalypt_forest", 
+                indicator: "forest maturity", 
+                image: "🦇",
+                biomes: ["temperate_rainforest", "forest"]
+            },
+            fish: { 
+                name: "Australian Grayling", 
+                rarity: "endangered", 
+                habitat: "riparian", 
+                indicator: "water quality", 
+                image: "🐟",
+                biomes: ["temperate_rainforest", "forest", "mountain"]
+            },
+            ground_parrot: { 
+                name: "Eastern Ground Parrot", 
+                rarity: "endangered", 
+                habitat: "coastal_heath", 
+                indicator: "heathland health", 
+                image: "🦜",
+                biomes: ["coastal", "marine_coastal"]
+            },
+            leadbeater: { 
+                name: "Leadbeater's Possum", 
+                rarity: "endangered", 
+                habitat: "mountain_ash", 
+                indicator: "old growth forest", 
+                image: "🐿️",
+                biomes: ["temperate_rainforest"]
+            },
+            helmeted_honeyeater: { 
+                name: "Helmeted Honeyeater", 
+                rarity: "endangered", 
+                habitat: "swamp_forest", 
+                indicator: "wetland health", 
+                image: "🐦",
+                biomes: ["temperate_rainforest", "forest"]
+            }
         };
 
         // Victoria facts for educational popups
@@ -364,7 +455,7 @@
         const initialEcosystemData = {
             shrubsPlanted: 0,
             treesPlanted: 0,
-            wildlifeObserved: [],
+            wildlifeObserved: [], // Ensure this is an empty array
             invasiveSpeciesRemoved: 0,
             ecosystemHealth: 50,
             biodiversityIndex: 30,
@@ -459,9 +550,10 @@
             invasiveSpeciesRemoved: "Number of invasive plants and animals removed - helps native species"
         };
 
-        // AI model simulation with more sophisticated responses
+        // AI model simulation with more sophisticated responses - UPDATED WILDLIFE RESPONSES
         const generateAIResponse = (choice, ecosystemData, location) => {
             const { ecosystemHealth, biodiversityIndex, waterQuality, season, temperature, co2Level } = ecosystemData;
+            const locationData = locations[location];
             
             const responses = {
                 "plant_shrubs": [
@@ -475,9 +567,9 @@
                     "Removing weeds reduces competition for water and nutrients."
                 ],
                 "observe_wildlife": [
-                    `You spot ${ecosystemHealth > 60 ? 'increased wildlife activity' : 'signs of struggling wildlife'}.`,
-                    `${season === 'spring' ? 'Spring brings new life to the area.' : ''} You notice animal tracks and feeding signs.`,
-                    "Careful observation reveals how species are interacting with the habitat."
+                    `You spend time quietly observing ${locationData.name}. ${ecosystemHealth > 60 ? 'Wildlife seems active and healthy.' : 'You notice limited wildlife activity.'}`,
+                    `Careful observation reveals ${biodiversityIndex > 40 ? 'diverse species interactions' : 'signs of ecosystem stress'}.`,
+                    `You document wildlife behavior and habitat usage patterns. ${season === 'spring' ? 'Spring brings increased activity!' : ''}`
                 ],
                 "explore": [
                     `You explore the area. ${biodiversityIndex > 40 ? 'The biodiversity seems richer here.' : ''}`,
@@ -590,7 +682,7 @@
             return response;
         };
 
-        // More sophisticated ecosystem update function
+        // More sophisticated ecosystem update function - UPDATED OBSERVE_WILDLIFE CASE
         const updateEcosystem = (choice, ecosystemData, currentLocation) => {
             const updatedData = { ...ecosystemData };
             const locationData = locations[currentLocation];
@@ -631,22 +723,74 @@
                     updatedData.budget -= choice.cost * costMultiplier;
                     break;
                 case "observe_wildlife":
-                    // Allow "forest" species in forest biomes, "varied" everywhere
+                    // COMPLETELY REWRITTEN WILDLIFE OBSERVATION LOGIC
+                    // Improved wildlife observation logic with better habitat matching
                     const possibleNewSpecies = Object.keys(victoriaWildlife).filter(species => {
+                        // Skip if already observed
                         if (updatedData.wildlifeObserved.includes(species)) return false;
-                        const habitat = victoriaWildlife[species].habitat;
-                        if (habitat === "varied") return true;
-                        if (habitat === "forest" && locationData.biome.includes("forest")) return true;
-                        return habitat === locationData.biome;
+                        
+                        const speciesData = victoriaWildlife[species];
+                        const currentBiome = locationData.biome;
+                        
+                        // Always include "varied" habitat species
+                        if (speciesData.habitat === "varied") return true;
+                        
+                        // Direct biome match using the new biomes array
+                        if (speciesData.biomes && speciesData.biomes.includes(currentBiome)) return true;
+                        
+                        // Expanded habitat-biome relationships for Victoria region
+                        const habitatMatches = {
+                            // Forest habitats
+                            "eucalypt_forest": ["temperate_rainforest", "mountain", "forest"],
+                            "forest": ["temperate_rainforest", "mountain", "forest"],
+                            "rainforest": ["temperate_rainforest", "forest"],
+                            "mountain_ash": ["temperate_rainforest"],
+                            "swamp_forest": ["temperate_rainforest", "forest"],
+                            
+                            // Coastal habitats  
+                            "coastal_heath": ["marine_coastal", "coastal"],
+                            "freshwater_rivers": ["mountain", "temperate_rainforest", "forest", "coastal"],
+                            "riparian": ["temperate_rainforest", "forest", "mountain"],
+                            
+                            // General habitats
+                            "grassland": ["arid", "forest", "mountain"]
+                        };
+                        
+                        // Check if current biome matches any of the allowed habitats for this species
+                        return habitatMatches[speciesData.habitat]?.includes(currentBiome) || false;
                     });
-                    if (Math.random() < updatedData.biodiversityIndex / 100 && possibleNewSpecies.length > 0) {
+                    
+                    // Calculate discovery chance - more generous now
+                    const baseDiscoveryChance = 0.4; // Increased to 40% base chance
+                    const biodiversityBonus = updatedData.biodiversityIndex / 150; // More generous bonus
+                    const discoveryChance = Math.min(baseDiscoveryChance + biodiversityBonus, 0.8); // Cap at 80%
+                    
+                    console.log(`Observing wildlife in ${locationData.name} (${locationData.biome}): ${possibleNewSpecies.length} possible new species`);
+                    
+                    if (Math.random() < discoveryChance && possibleNewSpecies.length > 0) {
                         const newSpecies = possibleNewSpecies[Math.floor(Math.random() * possibleNewSpecies.length)];
                         updatedData.wildlifeObserved.push(newSpecies);
-                        updatedData.biodiversityIndex += 2;
+                        updatedData.biodiversityIndex += 3; // Increased bonus for discovery
+                        
+                        // Ensure storyLog exists and add discovery message
                         if (!updatedData.storyLog) updatedData.storyLog = [];
-                        updatedData.storyLog.push(`🦘 You discovered a ${victoriaWildlife[newSpecies].name}!`);
+                        const speciesInfo = victoriaWildlife[newSpecies];
+                        updatedData.storyLog.push(`🎉 You discovered a ${speciesInfo.name} (${speciesInfo.rarity})! ${speciesInfo.image} - ${speciesInfo.indicator} indicator`);
+                        
+                        // Special bonus for endangered species
+                        if (speciesInfo.rarity === "endangered") {
+                            updatedData.biodiversityIndex += 2;
+                            updatedData.reputation += 5;
+                        }
+                    } else if (possibleNewSpecies.length > 0) {
+                        // Add message even when no discovery happens
+                        if (!updatedData.storyLog) updatedData.storyLog = [];
+                        updatedData.storyLog.push(`🔍 You observed wildlife but didn't discover any new species this time.`);
                     }
-                    updatedData.ecosystemHealth += 1;
+                    
+                    // Always provide benefits for observation
+                    updatedData.ecosystemHealth += 2;
+                    updatedData.biodiversityIndex += 1;
                     break;
                 case "explore":
                     // Explore new locations
